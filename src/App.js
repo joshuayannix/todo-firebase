@@ -4,9 +4,11 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import './App.css';
 import Todo from './Todo';
 import db from './firebase';
+import firebase from 'firebase';
+
 
 function App() {
-  const [todos, setTodos] = useState(['log hours', 'code', 'bench press']);
+  const [todos, setTodos] = useState([]);
   const [input, setInput] = useState('');
 
     // when the app loads, we need to listen to the database and fetch new todos as they get added/removed
@@ -15,7 +17,7 @@ function App() {
     // so this useEffect only happens when the database changes, or when app.js loads
 
   useEffect(() => {
-    db.collection('todos').onSnapshot(snapshot => {
+    db.collection('todos').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
       setTodos(snapshot.docs.map(doc => doc.data().todo))
       console.log(snapshot.docs.map(doc => doc.data().todo))
     })
@@ -25,15 +27,17 @@ function App() {
     event.preventDefault();
     // setTodos([...todos, input])
     db.collection('todos').add({
-      todo: input
+      todo: input,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-    
+
     setInput('');
   }
 
   return (
     <div className="App">
       <h1>hello world</h1>
+      
       <form action="">
 
         <FormControl>
